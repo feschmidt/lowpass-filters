@@ -22,7 +22,16 @@ from scipy.constants import hbar, pi
 import stlabutils
 from stlabutils.utils.stlabdict import framearr_to_mtx
 
+
 # Self-written modules
+def S21(w,R1,C1,R2,C2):
+    return 1/((1+1j*w*R1*C1)*(1+1j*w*R2*C2))
+
+def S21dB(w,R1,C1,R2,C2):
+    return 20*np.log10(np.abs(S21(w,R1,C1,R2,C2)))
+
+def S21ph(w,R1,C1,R2,C2):
+    return np.angle(S21(w,R1,C1,R2,C2))
 
 
 # Plot parameters

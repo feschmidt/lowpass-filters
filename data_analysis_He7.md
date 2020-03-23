@@ -15,7 +15,7 @@ jupyter:
 
 <!-- #region toc=true -->
 <h1>Table of Contents<span class="tocSkip"></span></h1>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Data-analysis-of-low-pass-filter-measurements-at-room-temperature" data-toc-modified-id="Data-analysis-of-low-pass-filter-measurements-at-room-temperature-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>Data analysis of low-pass filter measurements at room temperature</a></span><ul class="toc-item"><li><span><a href="#What-does-a-simple-cable-look-like?" data-toc-modified-id="What-does-a-simple-cable-look-like?-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>What does a simple cable look like?</a></span></li><li><span><a href="#What-effect-does-a-filter-have-on-the-transfer-function?" data-toc-modified-id="What-effect-does-a-filter-have-on-the-transfer-function?-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>What effect does a filter have on the transfer function?</a></span></li><li><span><a href="#How-do-all-the-filters-compare-with-each-other-at-medium-frequencies?" data-toc-modified-id="How-do-all-the-filters-compare-with-each-other-at-medium-frequencies?-1.3"><span class="toc-item-num">1.3&nbsp;&nbsp;</span>How do all the filters compare with each other at medium frequencies?</a></span></li><li><span><a href="#How-do-all-the-filters-compare-with-each-other-at-low-frequencies?" data-toc-modified-id="How-do-all-the-filters-compare-with-each-other-at-low-frequencies?-1.4"><span class="toc-item-num">1.4&nbsp;&nbsp;</span>How do all the filters compare with each other at low frequencies?</a></span></li></ul></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#Data-analysis-of-low-pass-filter-measurements-at-room-temperature" data-toc-modified-id="Data-analysis-of-low-pass-filter-measurements-at-room-temperature-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>Data analysis of low-pass filter measurements at room temperature</a></span><ul class="toc-item"><li><span><a href="#What-does-a-simple-cable-look-like?" data-toc-modified-id="What-does-a-simple-cable-look-like?-1.1"><span class="toc-item-num">1.1&nbsp;&nbsp;</span>What does a simple cable look like?</a></span></li><li><span><a href="#What-effect-does-a-filter-have-on-the-transfer-function?" data-toc-modified-id="What-effect-does-a-filter-have-on-the-transfer-function?-1.2"><span class="toc-item-num">1.2&nbsp;&nbsp;</span>What effect does a filter have on the transfer function?</a></span><ul class="toc-item"><li><span><a href="#for-thesis" data-toc-modified-id="for-thesis-1.2.1"><span class="toc-item-num">1.2.1&nbsp;&nbsp;</span>for thesis</a></span></li><li><span><a href="#fitting" data-toc-modified-id="fitting-1.2.2"><span class="toc-item-num">1.2.2&nbsp;&nbsp;</span>fitting</a></span></li></ul></li><li><span><a href="#How-do-all-the-filters-compare-with-each-other-at-medium-frequencies?" data-toc-modified-id="How-do-all-the-filters-compare-with-each-other-at-medium-frequencies?-1.3"><span class="toc-item-num">1.3&nbsp;&nbsp;</span>How do all the filters compare with each other at medium frequencies?</a></span><ul class="toc-item"><li><span><a href="#fitting" data-toc-modified-id="fitting-1.3.1"><span class="toc-item-num">1.3.1&nbsp;&nbsp;</span>fitting</a></span></li></ul></li><li><span><a href="#How-do-all-the-filters-compare-with-each-other-at-low-frequencies?" data-toc-modified-id="How-do-all-the-filters-compare-with-each-other-at-low-frequencies?-1.4"><span class="toc-item-num">1.4&nbsp;&nbsp;</span>How do all the filters compare with each other at low frequencies?</a></span><ul class="toc-item"><li><span><a href="#fitting" data-toc-modified-id="fitting-1.4.1"><span class="toc-item-num">1.4.1&nbsp;&nbsp;</span>fitting</a></span></li></ul></li></ul></li></ul></div>
 <!-- #endregion -->
 
 # Data analysis of low-pass filter measurements at room temperature
@@ -27,6 +27,10 @@ jupyter:
 
 ```python
 %run src/basemodules.py
+```
+
+```python
+[x.split('/')[-1] for x in sorted(glob.glob(dataHe7+'*/*.dat'))]
 ```
 
 ## What does a simple cable look like?
@@ -67,7 +71,7 @@ for myfile in myfiles:
 ```python
 fig, ax = plt.subplots()
 for name, line in zip(names_all_cables, data_all_cables):
-    plt.plot(line, label=name)
+    plt.plot(line, '.-',label=name)
 plt.title('Input power: {:.1f} dBm'.format(rfpower))
 plt.xscale('log')
 plt.xlabel('Frequency (Hz)')
@@ -115,17 +119,99 @@ for myfile in myfiles:
 ```
 
 ```python
+ftheo = data_all_filters[0].index.values
+```
+
+```python
 fig, ax = plt.subplots()
 for name, line in zip(names_all_filters[::-1], data_all_filters[::-1]):
-    plt.plot(line, label=name)
+    plt.plot(line, '.-',label=name)
+
+plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
+
 plt.title('Input power: {:.1f} dBm'.format(rfpower))
 plt.xscale('log')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('S21 (dB)')
 plt.legend(loc='best')
-plt.savefig('plots/He7_filter_comparison_Prf_{:.1f}dBm.png'.format(rfpower))
+#plt.savefig('plots/He7_filter_comparison_Prf_{:.1f}dBm.png'.format(rfpower))
 plt.show()
 plt.close()
+```
+
+### for thesis
+
+```python
+fig = plt.figure(figsize=cm2inch(12,8))
+for name, line in zip(names_all_filters, data_all_filters):
+    if not name=='no filter':
+        plt.plot(line,label=name)
+
+plt.title('Input power: {:.1f} dBm'.format(rfpower))
+plt.xscale('log')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel(r'$|S_{21}|$ (dB)')
+plt.legend(loc='best')
+plt.savefig('plots/He7_filter_comparison_Prf_{:.1f}dBm_thesis.png'.format(rfpower),dpi=1000)
+plt.show()
+plt.close()
+```
+
+```python
+
+```
+
+### fitting
+
+```python
+xdata = []
+ydata = []
+for name, line in zip(names_all_filters[::-1], data_all_filters[::-1]):
+    if 'RC' in name:
+        xdata.append(line.index.values)
+        ydata.append(line.values)
+
+xdata0 = np.array(xdata).flatten()
+ydata0 = np.array(ydata).flatten()
+
+xdata = xdata0[np.where(xdata0<2e7)[0]]
+ydata = ydata0[np.where(xdata0<2e7)[0]]
+
+plt.plot(xdata,ydata,'.')
+plt.xscale('log')
+```
+
+```python
+mymodel = lmfit.Model(S21dB)
+mymodel.param_names,mymodel.independent_vars
+```
+
+```python
+params = mymodel.make_params(R1=470,C1=10e-9,R2=2e3,C2=470e-12)
+for key,val in params.items():
+    params[key].min=0
+params['C1'].vary=False
+params['C2'].vary=False
+```
+
+```python
+params
+```
+
+```python
+result = mymodel.fit(ydata-max(ydata), params, w=2*pi*xdata)
+result.params
+```
+
+```python
+result.plot()
+print(result.fit_report())
+```
+
+```python
+plt.plot(xdata,ydata-max(ydata),'.')
+plt.plot(np.sort(xdata),mymodel.eval(result.params,w=2*pi*np.sort(xdata)))
+plt.xscale('log')
 ```
 
 ## How do all the filters compare with each other at medium frequencies?
@@ -170,9 +256,16 @@ for myfile in myfiles:
 ```
 
 ```python
+ftheo = data_all_filters[0].index.values
+```
+
+```python
 fig, ax = plt.subplots()
 for name, line in zip(names_all_filters, data_all_filters):
-    plt.plot(line, label=name)
+    plt.plot(line, '.-',label=name)
+
+plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
+
 plt.title('Input power: {:.1f} dBm'.format(rfpower))
 plt.xscale('log')
 plt.xlabel('Frequency (Hz)')
@@ -181,6 +274,54 @@ plt.legend(loc='best')
 plt.savefig('plots/He7_RC_all_midfreq_Prf_{:.1f}dBm.png'.format(rfpower))
 plt.show()
 plt.close()
+```
+
+### fitting
+
+```python
+xdata0 = np.array([x.index.values for x in data_all_filters]).flatten()
+ydata0 = np.array([x.values for x in data_all_filters]).flatten()
+
+xdata = xdata0[np.where(xdata0<2e7)[0]]
+ydata = ydata0[np.where(xdata0<2e7)[0]]
+```
+
+```python
+plt.plot(xdata,ydata,'.')
+plt.xscale('log')
+```
+
+```python
+mymodel = lmfit.Model(S21dB)
+mymodel.param_names,mymodel.independent_vars
+```
+
+```python
+params = mymodel.make_params(R1=470,C1=10e-9,R2=2e3,C2=470e-12)
+for key,val in params.items():
+    params[key].min=0
+params['C1'].vary=False
+params['C2'].vary=False
+```
+
+```python
+params
+```
+
+```python
+result = mymodel.fit(ydata-max(ydata), params, w=2*pi*xdata)
+result.params
+```
+
+```python
+result.plot()
+print(result.fit_report())
+```
+
+```python
+plt.plot(xdata,ydata-max(ydata),'.')
+plt.plot(np.sort(xdata),mymodel.eval(result.params,w=2*pi*np.sort(xdata)))
+plt.xscale('log')
 ```
 
 ## How do all the filters compare with each other at low frequencies?
@@ -225,9 +366,16 @@ for myfile in myfiles:
 ```
 
 ```python
+ftheo = data_all_filters[0].index.values
+```
+
+```python
 fig, ax = plt.subplots()
 for name, line in zip(names_all_filters, data_all_filters):
-    plt.plot(line, label=name)
+    plt.plot(line-max(line), '.-',label=name)
+
+plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
+
 plt.title('Input power: {:.1f} dBm'.format(rfpower))
 plt.xscale('log')
 plt.xlabel('Frequency (Hz)')
@@ -241,7 +389,10 @@ plt.close()
 ```python
 fig, ax = plt.subplots()
 for name, line in zip(names_all_filters, data_all_filters):
-    plt.plot(line, label=name)
+    plt.plot(line-max(line), '.-',label=name)
+
+plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
+
 plt.xlim(9e3, 6e4)
 plt.ylim(-5, 1)
 plt.grid(which='both')
@@ -253,6 +404,108 @@ plt.legend(loc='best')
 plt.savefig('plots/He7_RC_all_lowfreq_zoom_Prf_{:.1f}dBm.png'.format(rfpower))
 plt.show()
 plt.close()
+```
+
+```python
+
+```
+
+### fitting
+
+```python
+xdata = np.array([x.index.values for x in data_all_filters]).flatten()
+ydata = np.array([x.values for x in data_all_filters]).flatten()
+
+#xdata = xdata0[np.where(xdata0<2e7)[0]]
+#ydata = ydata0[np.where(xdata0<2e7)[0]]
+```
+
+```python
+plt.plot(xdata,ydata,'.')
+plt.xscale('log')
+```
+
+```python
+mymodel = lmfit.Model(S21dB)
+mymodel.param_names,mymodel.independent_vars
+```
+
+```python
+params = mymodel.make_params(R1=470,C1=10e-9,R2=2e3,C2=470e-12)
+for key,val in params.items():
+    params[key].min=0
+params['C1'].vary=False
+params['C2'].vary=False
+```
+
+```python
+params
+```
+
+```python
+result = mymodel.fit(ydata-max(ydata), params, w=2*pi*xdata)
+result.params
+```
+
+```python
+result.plot()
+print(result.fit_report())
+```
+
+```python
+plt.plot(xdata,ydata-max(ydata),'.',label='data')
+plt.plot(np.sort(xdata),mymodel.eval(result.params,w=2*pi*np.sort(xdata)),label='final fit')
+plt.plot(np.sort(xdata),mymodel.eval(params,w=2*pi*np.sort(xdata)),label='guess')
+plt.xscale('log')
+plt.legend(loc=3)
+plt.xlim(8e3, 7e4)
+plt.ylim(-5, 1)
+plt.show()
+plt.close()
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
 ```
 
 ```python

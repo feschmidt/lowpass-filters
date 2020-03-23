@@ -37,18 +37,7 @@ Transfer function of a two stage RC filter:
 ```
 
 ```python
-def S21(w,R1,C1,R2,C2):
-    return 1/((1+1j*w*R1*C1)*(1+1j*w*R2*C2))
-
-def S21dB(w,R1,C1,R2,C2):
-    return 20*np.log10(np.abs(S21(w,R1,C1,R2,C2)))
-
-def S21ph(w,R1,C1,R2,C2):
-    return np.angle(S21(w,R1,C1,R2,C2))
-```
-
-```python
-w=2*pi*np.logspace(3,6,401)
+w=2*pi*np.logspace(3,7,401)
 R1,C1,R2,C2=470,10e-9,2e3,470e-12
 ```
 
