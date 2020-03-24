@@ -64,7 +64,7 @@ for myfile in myfiles:
 
     # plotting linecut for reference
     linecut = mtx.pmtx[rfpower]
-    linecut -= linecut.iloc[0]
+    #linecut -= linecut.iloc[0]
     data_all_cables.append(linecut)
 ```
 
@@ -114,7 +114,7 @@ for myfile in myfiles:
 
     # plotting linecut for reference
     linecut = mtx.pmtx[rfpower]
-    linecut -= linecut.iloc[0]
+    #linecut -= linecut.iloc[0]
     data_all_filters.append(linecut)
 ```
 
@@ -251,7 +251,7 @@ for myfile in myfiles:
 
     # plotting linecut for reference
     linecut = mtx.pmtx[rfpower]
-    linecut -= linecut.iloc[0]
+    #linecut -= linecut.iloc[0]
     data_all_filters.append(linecut)
 ```
 
@@ -361,7 +361,7 @@ for myfile in myfiles:
 
     # plotting linecut for reference
     linecut = mtx.pmtx[rfpower]
-    linecut -= linecut.iloc[0]
+    #linecut -= linecut.iloc[0]
     data_all_filters.append(linecut)
 ```
 

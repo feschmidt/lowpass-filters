@@ -25,7 +25,9 @@ from stlabutils.utils.stlabdict import framearr_to_mtx
 
 # Self-written modules
 def S21(w,R1,C1,R2,C2):
-    return 1/((1+1j*w*R1*C1)*(1+1j*w*R2*C2))
+    # https://electronics.stackexchange.com/questions/152159/deriving-2nd-order-passive-low-pass-filter-cutoff-frequency/152168#152168
+    # http://sim.okawa-denshi.jp/en/CRCRkeisan.htm
+    return 1/((1j*w)**2*R1*R2*C1*C2 + 1j*w*(R1*C1+R1*C2+R2*C2)+1)
 
 def S21dB(w,R1,C1,R2,C2):
     return 20*np.log10(np.abs(S21(w,R1,C1,R2,C2)))
