@@ -49,15 +49,15 @@ RCCPdata= np.loadtxt(RCCPfile,delimiter=';',skiprows=3,usecols=range(5),unpack=T
 ```
 
 ```python
-ftheo = RCdata[0,:]
+fmeas = RCdata[0]
 ```
 
 ```python
 fig = plt.figure(figsize=cm2inch(12,8))
 
-plt.plot(RCdata[0,:],RCdata[3,:],label='RC filter')
-plt.plot(CPdata[0,:],CPdata[3,:],label='CP filter')
-plt.plot(RCCPdata[0,:],RCCPdata[3,:],label='RC + CP')
+plt.plot(fmeas,RCdata[3],label='RC filter')
+plt.plot(fmeas,CPdata[3],label='CP filter')
+plt.plot(fmeas,RCCPdata[3],label='RC + CP')
 
 #plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
 

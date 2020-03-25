@@ -125,16 +125,16 @@ ftheo = data_all_filters[0].index.values
 ```python
 fig, ax = plt.subplots()
 for name, line in zip(names_all_filters[::-1], data_all_filters[::-1]):
-    plt.plot(line, '.-',label=name)
+    plt.plot(line,label=name)
 
-plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
+#plt.plot(ftheo,S21dB(w=2*pi*ftheo,R1=470,C1=10e-9,R2=2e3,C2=470e-12),c='k',ls='--',label='theo')
 
 plt.title('Input power: {:.1f} dBm'.format(rfpower))
 plt.xscale('log')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('S21 (dB)')
 plt.legend(loc='best')
-#plt.savefig('plots/He7_filter_comparison_Prf_{:.1f}dBm.png'.format(rfpower))
+plt.savefig('plots/He7_filter_comparison_Prf_{:.1f}dBm.png'.format(rfpower))
 plt.show()
 plt.close()
 ```

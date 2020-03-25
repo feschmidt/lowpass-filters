@@ -219,7 +219,7 @@ nCold = nphot(freqs,TStill,0.1,10**(-attCold/10))
 TCold = Tnew(freqs,TStill,0.1,10**(-attCold/10))
 
 # after 3dB at 10mK
-attMXC=20
+attMXC=10
 nMXC = nphot(freqs,TCold,0.01,10**(-attMXC/10))
 TMXC = Tnew(freqs,TCold,0.01,10**(-attMXC/10))
 
@@ -227,6 +227,7 @@ attTotal = att50+att4+attStill+attCold+attMXC
 for x,theatt in zip([50,4,1,0.1,0.01],[att50,att4,attStill,attCold,attMXC]):
     print(f'Attenuation at {x} K: {theatt} dB')
 print(f'Total attenuation: {attTotal} dB')
+print(f'Minimum temperature at MXC: {min(TMXC)} K')
 ```
 
 ```python
@@ -253,9 +254,10 @@ plt.axhline(1,c='k',ls='--')
 plt.yscale('log')
 plt.xscale('log')
 ylim = ax2.get_ylim()
-[plt.plot(freqs,nBE(freqs,x),c='C'+str(i),ls='--') for i,x in enumerate([50,4,1,0.1,0.01])]
+[plt.plot(freqs,nBE(freqs,x),c='C'+str(i),ls='--',label=x) for i,x in enumerate([50,4,1,0.1,0.01])]
 ax2.set_ylim(ylim)
 plt.ylabel('Photon flux')
+plt.legend()
 
 for theax in [ax1,ax2]:
     #theax.set_xscale('log')
@@ -263,8 +265,12 @@ for theax in [ax1,ax2]:
     theax.set_xlabel('Frequency (Hz)')
     
 plt.suptitle('RF attenuators')
+plt.savefig('plots/theo_RFatt.png',dpi=dpi,bbox_inches='tight')
 plt.show()
 plt.close()
+
+print('Dashed lines: stage temperature/photon flux of',[50,4,1,0.1,0.01],'K')
+print('Solid lines: electronic noise temperature/photon flux of the corresponding stages')
 ```
 
 ```python
@@ -278,9 +284,11 @@ plt.xlabel('Frequency (Hz)')
 plt.ylabel(r'$k_B T/h\nu$')
 plt.show()
 plt.close()
+
+print('Deviations from exected stage temperature occur for hf>kT')
 ```
 
-## DC low-pass
+## DC low-pass He7
 
 ```python
 myfiles = [
@@ -334,6 +342,7 @@ attDC = abs(data_all_filters[-1])
 ```python
 nDC = nphot(fmeas,300,0.01,10**(-attDC/10))
 TDC = Tnew(fmeas,300,0.01,10**(-attDC/10))
+print(f'Minimum temperature at MXC: {min(TDC)} K')
 ```
 
 ```python
@@ -360,6 +369,82 @@ plt.legend()
 plt.axhline(1,c='k',ls='--')
 
 plt.suptitle('DC filters')
+plt.savefig('plots/theo_DCatt.png',dpi=dpi,bbox_inches='tight')
+plt.show()
+plt.close()
+```
+
+```python
+
+```
+
+## DC low-pass Triton
+
+```python
+myfiles = sorted(glob.glob(datamisc+'*triton*'))
+myfiles
+
+RCfile = myfiles[3]
+CPfile = myfiles[1]
+RCCPfile = myfiles[2]
+
+RCdata= np.loadtxt(RCfile,delimiter=';',skiprows=3,usecols=range(5),unpack=True)
+CPdata= np.loadtxt(CPfile,delimiter=';',skiprows=3,usecols=range(5),unpack=True)
+RCCPdata= np.loadtxt(RCCPfile,delimiter=';',skiprows=3,usecols=range(5),unpack=True)
+
+fmeas = RCdata[0]
+```
+
+```python
+fig = plt.figure()#figsize=cm2inch(12,8))
+
+plt.plot(fmeas,RCdata[3],label='RC filter')
+plt.plot(fmeas,CPdata[3],label='CP filter')
+plt.plot(fmeas,RCCPdata[3],label='RC + CP')
+plt.legend()
+plt.xscale('log')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('|S$_{21}$| (dB)')
+plt.tight_layout()
+plt.show()
+plt.close()
+```
+
+```python
+attDC = abs(RCCPdata[3])
+```
+
+```python
+nDC = nphot(fmeas,300,0.01,10**(-attDC/10))
+TDC = Tnew(fmeas,300,0.01,10**(-attDC/10))
+print(f'Minimum temperature at MXC: {min(TDC)} K')
+```
+
+```python
+fig=plt.figure(figsize=(12,4))
+gs=fig.add_gridspec(1,2)
+ax1=fig.add_subplot(gs[0,0])
+for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
+    plt.plot(fmeas,Tnew(fmeas,300,0.01,10**(-abs(line)/10)),label=name)
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Noise temperature (K)')
+plt.axhline(0.01,c='k',ls='--')
+plt.legend()
+
+ax2=fig.add_subplot(gs[0,1])
+for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
+    plt.plot(fmeas,nphot(fmeas,300,0.01,10**(-abs(line)/10)),label=name)
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Photon flux')
+plt.legend()
+plt.axhline(1,c='k',ls='--')
+
+plt.suptitle('DC filters')
+plt.savefig('plots/theo_DCatt_Triton.png',dpi=dpi,bbox_inches='tight')
 plt.show()
 plt.close()
 ```
