@@ -2,3 +2,6 @@
 *.ipynb
 *.pdf
 .ipynb_checkpoints
+*.tar.gz
+*.dat
+*.pkl
