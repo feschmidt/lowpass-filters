@@ -49,8 +49,10 @@ mysims['RC_lowpass'][0].keys()
 mysims['RC_lowpass'][1]
 ```
 
+## plot sims
+
 ```python
-fig = plt.figure(figsize=cm2inch(12,8))
+fig = plt.figure(figsize=cm2inch(12,8),constrained_layout=True)
 for i,(key,_) in enumerate(mysims.items()):
     if i==0:
         c='C0'
@@ -74,7 +76,7 @@ plt.legend()
 plt.ylim(-150,20)
 plt.xlabel('Frequency (Hz)')
 plt.ylabel(r'$|S_{21}|$ (dB)')
-plt.savefig('plots/RCfilter_qucs.png',dpi=1000)
+plt.savefig('plots/RCfilter_qucs.png',dpi=1000,bbox_inches='tight')
 plt.show()
 plt.close()
 ```

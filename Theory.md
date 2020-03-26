@@ -188,43 +188,47 @@ plt.plot(atts,Tnew(1,300,3,10**(atts/10)))
 plt.yscale('log')
 ```
 
-## 300K to 10mK
+## 300K to 15mK
 
 
-Let's assume we have the following stages: 300K, 50K, 4K, 1K, 0.1K, 0.01K, and we use the following attenuators (typical for our setups): 3, 6, 20, 20, 3
+Let's assume we have the following stages: 300K, 50K, 4K, 1K, 0.1K, 0.015K, and we use the following attenuators (typical for our setups): 3, 6, 20, 20, 3
 
 ```python
-freqs = np.logspace(0,12,401)
+freqs = np.logspace(5,12,401)
+```
+
+```python
+stagetemps = [50,4,1,0.1,0.015]
 ```
 
 ```python
 # after 3dB at 50K
 att50=3
-n50 = nphot(freqs,300,50,10**(-att50/10))
-T50 = Tnew(freqs,300,50,10**(-att50/10))
+n50 = nphot(freqs,300,stagetemps[0],10**(-att50/10))
+T50 = Tnew(freqs,300,stagetemps[0],10**(-att50/10))
 
 # after 6dB at 4K
 att4=6
-n4 = nphot(freqs,T50,4,10**(-att4/10))
-T4 = Tnew(freqs,T50,4,10**(-att4/10))
+n4 = nphot(freqs,T50,stagetemps[1],10**(-att4/10))
+T4 = Tnew(freqs,T50,stagetemps[1],10**(-att4/10))
 
 # after 20dB at 1K
 attStill=20
-nStill = nphot(freqs,T4,1,10**(-attStill/10))
-TStill = Tnew(freqs,T4,1,10**(-attStill/10))
+nStill = nphot(freqs,T4,stagetemps[2],10**(-attStill/10))
+TStill = Tnew(freqs,T4,stagetemps[2],10**(-attStill/10))
 
 # after 20dB at 100mK
 attCold=20
-nCold = nphot(freqs,TStill,0.1,10**(-attCold/10))
-TCold = Tnew(freqs,TStill,0.1,10**(-attCold/10))
+nCold = nphot(freqs,TStill,stagetemps[3],10**(-attCold/10))
+TCold = Tnew(freqs,TStill,stagetemps[3],10**(-attCold/10))
 
-# after 3dB at 10mK
+# after 3dB at 15mK
 attMXC=10
-nMXC = nphot(freqs,TCold,0.01,10**(-attMXC/10))
-TMXC = Tnew(freqs,TCold,0.01,10**(-attMXC/10))
+nMXC = nphot(freqs,TCold,stagetemps[4],10**(-attMXC/10))
+TMXC = Tnew(freqs,TCold,stagetemps[4],10**(-attMXC/10))
 
 attTotal = att50+att4+attStill+attCold+attMXC
-for x,theatt in zip([50,4,1,0.1,0.01],[att50,att4,attStill,attCold,attMXC]):
+for x,theatt in zip(stagetemps,[att50,att4,attStill,attCold,attMXC]):
     print(f'Attenuation at {x} K: {theatt} dB')
 print(f'Total attenuation: {attTotal} dB')
 print(f'Minimum temperature at MXC: {min(TMXC)} K')
@@ -239,7 +243,7 @@ plt.plot(freqs,T4)
 plt.plot(freqs,TStill)
 plt.plot(freqs,TCold)
 plt.plot(freqs,TMXC)
-[plt.axhline(x,c='C'+str(i),ls='--') for i,x in enumerate([50,4,1,0.1,0.01])]
+[plt.axhline(x,c='C'+str(i),ls='--') for i,x in enumerate(stagetemps)]
 plt.yscale('log')
 plt.xscale('log')
 plt.ylabel('Temperature (K)')
@@ -254,7 +258,7 @@ plt.axhline(1,c='k',ls='--')
 plt.yscale('log')
 plt.xscale('log')
 ylim = ax2.get_ylim()
-[plt.plot(freqs,nBE(freqs,x),c='C'+str(i),ls='--',label=x) for i,x in enumerate([50,4,1,0.1,0.01])]
+[plt.plot(freqs,nBE(freqs,x),c='C'+str(i),ls='--',label=x) for i,x in enumerate(stagetemps)]
 ax2.set_ylim(ylim)
 plt.ylabel('Photon flux')
 plt.legend()
@@ -269,13 +273,13 @@ plt.savefig('plots/theo_RFatt.png',dpi=dpi,bbox_inches='tight')
 plt.show()
 plt.close()
 
-print('Dashed lines: stage temperature/photon flux of',[50,4,1,0.1,0.01],'K')
+print('Dashed lines: stage temperature/photon flux of',stagetemps,'K')
 print('Solid lines: electronic noise temperature/photon flux of the corresponding stages')
 ```
 
 ```python
 fig = plt.figure()
-[plt.plot(freqs,kB*x/(h*freqs),label=x) for i,x in enumerate([50,4,1,0.1,0.01])]
+[plt.plot(freqs,kB*x/(h*freqs),label=x) for i,x in enumerate(stagetemps)]
 plt.axhline(1,c='k',ls='--')
 plt.legend()
 plt.xscale('log')
@@ -340,8 +344,8 @@ attDC = abs(data_all_filters[-1])
 ```
 
 ```python
-nDC = nphot(fmeas,300,0.01,10**(-attDC/10))
-TDC = Tnew(fmeas,300,0.01,10**(-attDC/10))
+nDC = nphot(fmeas,300,stagetemps[4],10**(-attDC/10))
+TDC = Tnew(fmeas,300,stagetemps[4],10**(-attDC/10))
 print(f'Minimum temperature at MXC: {min(TDC)} K')
 ```
 
@@ -350,17 +354,17 @@ fig=plt.figure(figsize=(12,4))
 gs=fig.add_gridspec(1,2)
 ax1=fig.add_subplot(gs[0,0])
 for name, line in zip(names_all_filters, data_all_filters):
-    plt.plot(line.index.values,Tnew(fmeas,300,0.01,10**(-abs(line.values)/10)),label=name)
+    plt.plot(line.index.values,Tnew(fmeas,300,stagetemps[4],10**(-abs(line.values)/10)),label=name)
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Noise temperature (K)')
-plt.axhline(0.01,c='k',ls='--')
+plt.axhline(stagetemps[4],c='k',ls='--')
 plt.legend()
 
 ax2=fig.add_subplot(gs[0,1])
 for name, line in zip(names_all_filters, data_all_filters):
-    plt.plot(line.index.values,nphot(fmeas,300,0.01,10**(-abs(line.values)/10)),label=name)
+    plt.plot(line.index.values,nphot(fmeas,300,stagetemps[4],10**(-abs(line.values)/10)),label=name)
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Frequency (Hz)')
@@ -415,8 +419,8 @@ attDC = abs(RCCPdata[3])
 ```
 
 ```python
-nDC = nphot(fmeas,300,0.01,10**(-attDC/10))
-TDC = Tnew(fmeas,300,0.01,10**(-attDC/10))
+nDC = nphot(fmeas,300,stagetemps[4],10**(-attDC/10))
+TDC = Tnew(fmeas,300,stagetemps[4],10**(-attDC/10))
 print(f'Minimum temperature at MXC: {min(TDC)} K')
 ```
 
@@ -425,17 +429,17 @@ fig=plt.figure(figsize=(12,4))
 gs=fig.add_gridspec(1,2)
 ax1=fig.add_subplot(gs[0,0])
 for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
-    plt.plot(fmeas,Tnew(fmeas,300,0.01,10**(-abs(line)/10)),label=name)
+    plt.plot(fmeas,Tnew(fmeas,300,stagetemps[4],10**(-abs(line)/10)),label=name)
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Noise temperature (K)')
-plt.axhline(0.01,c='k',ls='--')
+plt.axhline(stagetemps[4],c='k',ls='--')
 plt.legend()
 
 ax2=fig.add_subplot(gs[0,1])
 for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
-    plt.plot(fmeas,nphot(fmeas,300,0.01,10**(-abs(line)/10)),label=name)
+    plt.plot(fmeas,nphot(fmeas,300,stagetemps[4],10**(-abs(line)/10)),label=name)
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('Frequency (Hz)')
@@ -445,6 +449,75 @@ plt.axhline(1,c='k',ls='--')
 
 plt.suptitle('DC filters')
 plt.savefig('plots/theo_DCatt_Triton.png',dpi=dpi,bbox_inches='tight')
+plt.show()
+plt.close()
+```
+
+## RF and DC in one plot
+
+```python
+fig = plt.figure(figsize=cm2inch(17,10),constrained_layout=True)
+gs = fig.add_gridspec(2,2)
+
+ax1=fig.add_subplot(gs[0,0])
+for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
+    plt.plot(fmeas,Tnew(fmeas,300,stagetemps[4],10**(-abs(line)/10)),label=name.strip(' filter'))
+plt.yscale('log')
+plt.axhline(stagetemps[4],c='k',ls='--',label=stagetemps[4])
+plt.legend()
+plt.title('DC lines',weight='bold')
+
+ax2=fig.add_subplot(gs[1,0])
+for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
+    plt.plot(fmeas,nphot(fmeas,300,stagetemps[4],10**(-abs(line)/10)),label=name.strip(' filter'))
+plt.yscale('log')
+ylim = ax2.get_ylim()
+plt.plot(fmeas,nBE(fmeas,stagetemps[4]),c='k',ls='--',label=stagetemps[4])
+ax2.set_ylim(ylim)
+#plt.axhline(1,c='k',ls='--')
+plt.legend()
+
+ax3=fig.add_subplot(gs[0,1])
+#plt.plot(freqs,T50)
+#plt.plot(freqs,T4)
+#plt.plot(freqs,TStill)
+#plt.plot(freqs,TCold)
+plt.plot(freqs,TMXC,label='Expected')
+#[plt.axhline(x,c='C'+str(i),ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
+[plt.axhline(x,c='k',ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
+plt.yscale('log')
+plt.legend()
+plt.title('RF lines',weight='bold')
+
+ax4=fig.add_subplot(gs[1,1])
+#plt.plot(freqs,n50)
+#plt.plot(freqs,n4)
+#plt.plot(freqs,nStill)
+#plt.plot(freqs,nCold)
+plt.plot(freqs,nMXC,label='Expected')
+#plt.axhline(1,c='k',ls='--')
+plt.yscale('log')
+ylim = ax4.get_ylim()
+#[plt.plot(freqs,nBE(freqs,x),c='C'+str(i),ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
+[plt.plot(freqs,nBE(freqs,x),c='k',ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
+ax4.set_ylim(ylim)
+plt.legend()
+
+for theax in [ax1,ax3]:
+    theax.set_xscale('log')
+    theax.set_xticklabels([])
+    theax.set_ylabel('Temperature (K)')
+for theax in [ax2,ax4]:
+    theax.set_xscale('log')
+    theax.set_xlabel('Frequency (Hz)')
+    theax.set_ylabel('Photon flux')
+    
+ax1.text(-.26, .95, "(a)", weight="bold", transform=ax1.transAxes)
+ax2.text(-.26, .95, "(b)", weight="bold", transform=ax2.transAxes)
+ax3.text(-.26, .95, "(c)", weight="bold", transform=ax3.transAxes)
+ax4.text(-.26, .95, "(d)", weight="bold", transform=ax4.transAxes)
+    
+plt.savefig('plots/noise_full.png',bbox_inches='tight',dpi=100)
 plt.show()
 plt.close()
 ```
