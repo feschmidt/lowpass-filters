@@ -181,6 +181,89 @@ plt.xscale('log')
 plt.legend()
 ```
 
+# Plot QUCS sims with data and photographs
+
+```python
+myfiles = sorted(glob.glob(datamisc+'*triton*'))
+myfiles
+
+RCfile = myfiles[3]
+CPfile = myfiles[1]
+RCCPfile = myfiles[2]
+
+RCdata= np.loadtxt(RCfile,delimiter=';',skiprows=3,usecols=range(5),unpack=True)
+CPdata= np.loadtxt(CPfile,delimiter=';',skiprows=3,usecols=range(5),unpack=True)
+RCCPdata= np.loadtxt(RCCPfile,delimiter=';',skiprows=3,usecols=range(5),unpack=True)
+
+fmeas = RCdata[0]
+```
+
+```python
+import matplotlib.image as mpimg
+```
+
+```python
+CP=mpimg.imread('qucs/image4149.png')
+RC=mpimg.imread('qucs/image4151.png')
+```
+
+```python
+fig = plt.figure(figsize=cm2inch(17,10),constrained_layout=True)
+gs = fig.add_gridspec(2,2)
+
+ax1 = fig.add_subplot(gs[0,0])
+for i,(key,_) in enumerate(mysims.items()):
+    if i==0:
+        c='C0'
+        ls='-'
+        label='real, two-stage'
+    elif i==1:
+        c='C0'
+        ls='--'
+        label='ideal, two-stage'
+    elif i==2:
+        c='C1'
+        ls='-'
+        label='real, single stage'
+    else:
+        c='C1'
+        ls='--'
+        label='ideal, single stage'
+    plt.plot(mysims[key][0]['indep_acfrequency'],mysims[key][0]['dep_S21dB'],label=label,c=c,ls=ls)
+plt.xscale('log')
+plt.legend()
+plt.ylim(-150,20)
+plt.xlabel('Frequency (Hz)')
+plt.ylabel(r'$|S_{21}|$ (dB)')
+
+ax2 = fig.add_subplot(gs[0,1])
+plt.plot(fmeas,RCdata[3],label='RC filter')
+plt.plot(fmeas,CPdata[3],label='CP filter')
+plt.plot(fmeas,RCCPdata[3],label='RC + CP')
+plt.legend()
+plt.xscale('log')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('|S$_{21}$| (dB)')
+
+ax3 = fig.add_subplot(gs[1,0])
+CPplot = plt.imshow(CP)
+
+ax4 = fig.add_subplot(gs[1,1])
+RCplot = plt.imshow(RC)
+
+for theax in [ax3,ax4]:
+    theax.axis('off')
+
+ax1.text(-.26, .95, "(a)", weight="bold", transform=ax1.transAxes)
+ax2.text(-.26, .95, "(b)", weight="bold", transform=ax2.transAxes)
+ax3.text(-.26, .95, "(c)", weight="bold", transform=ax3.transAxes)
+ax4.text(-.26, .95, "(d)", weight="bold", transform=ax4.transAxes)
+
+plt.savefig('plots/DC_filters.png',dpi=300,bbox_inches='tight')
+plt.show()
+plt.close()
+```
+
 ```python
 
 ```

@@ -213,7 +213,7 @@ n4 = nphot(freqs,T50,stagetemps[1],10**(-att4/10))
 T4 = Tnew(freqs,T50,stagetemps[1],10**(-att4/10))
 
 # after 20dB at 1K
-attStill=20
+attStill=10
 nStill = nphot(freqs,T4,stagetemps[2],10**(-attStill/10))
 TStill = Tnew(freqs,T4,stagetemps[2],10**(-attStill/10))
 
@@ -222,8 +222,8 @@ attCold=20
 nCold = nphot(freqs,TStill,stagetemps[3],10**(-attCold/10))
 TCold = Tnew(freqs,TStill,stagetemps[3],10**(-attCold/10))
 
-# after 3dB at 15mK
-attMXC=10
+# after 10dB at 15mK
+attMXC=20
 nMXC = nphot(freqs,TCold,stagetemps[4],10**(-attMXC/10))
 TMXC = Tnew(freqs,TCold,stagetemps[4],10**(-attMXC/10))
 
@@ -269,7 +269,7 @@ for theax in [ax1,ax2]:
     theax.set_xlabel('Frequency (Hz)')
     
 plt.suptitle('RF attenuators')
-plt.savefig('plots/theo_RFatt.png',dpi=dpi,bbox_inches='tight')
+plt.savefig('plots/theo_RFatt.png',dpi=100,bbox_inches='tight')
 plt.show()
 plt.close()
 
@@ -463,7 +463,7 @@ ax1=fig.add_subplot(gs[0,0])
 for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdata[3],RCCPdata[3]]):
     plt.plot(fmeas,Tnew(fmeas,300,stagetemps[4],10**(-abs(line)/10)),label=name.strip(' filter'))
 plt.yscale('log')
-plt.axhline(stagetemps[4],c='k',ls='--',label=stagetemps[4])
+plt.axhline(stagetemps[4],c='k',ls='--',label='15mK')
 plt.legend()
 plt.title('DC lines',weight='bold')
 
@@ -472,7 +472,7 @@ for name, line in zip(['RC filter','CP filter','RC+CP filter'], [RCdata[3],CPdat
     plt.plot(fmeas,nphot(fmeas,300,stagetemps[4],10**(-abs(line)/10)),label=name.strip(' filter'))
 plt.yscale('log')
 ylim = ax2.get_ylim()
-plt.plot(fmeas,nBE(fmeas,stagetemps[4]),c='k',ls='--',label=stagetemps[4])
+plt.plot(fmeas,nBE(fmeas,stagetemps[4]),c='k',ls='--',label='15mK')
 ax2.set_ylim(ylim)
 #plt.axhline(1,c='k',ls='--')
 plt.legend()
@@ -482,9 +482,12 @@ ax3=fig.add_subplot(gs[0,1])
 #plt.plot(freqs,T4)
 #plt.plot(freqs,TStill)
 #plt.plot(freqs,TCold)
-plt.plot(freqs,TMXC,label='Expected')
+#plt.plot(freqs,TMXC,label='Expected')
+for myatt in [3,10,20]:
+    plt.plot(freqs,Tnew(freqs,TCold,stagetemps[4],10**(-myatt/10)),label=f'{myatt}dB')
+
 #[plt.axhline(x,c='C'+str(i),ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
-[plt.axhline(x,c='k',ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
+[plt.axhline(x,c='k',ls='--',label='15mK') for i,x in enumerate(stagetemps[-1:])]
 plt.yscale('log')
 plt.legend()
 plt.title('RF lines',weight='bold')
@@ -494,12 +497,14 @@ ax4=fig.add_subplot(gs[1,1])
 #plt.plot(freqs,n4)
 #plt.plot(freqs,nStill)
 #plt.plot(freqs,nCold)
-plt.plot(freqs,nMXC,label='Expected')
+#plt.plot(freqs,nMXC,label='Expected')
+for myatt in [3,10,20]:
+    plt.plot(freqs,nphot(freqs,TCold,stagetemps[4],10**(-myatt/10)),label=f'{myatt}dB')
 #plt.axhline(1,c='k',ls='--')
 plt.yscale('log')
 ylim = ax4.get_ylim()
 #[plt.plot(freqs,nBE(freqs,x),c='C'+str(i),ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
-[plt.plot(freqs,nBE(freqs,x),c='k',ls='--',label=x) for i,x in enumerate(stagetemps[-1:])]
+[plt.plot(freqs,nBE(freqs,x),c='k',ls='--',label='15mK') for i,x in enumerate(stagetemps[-1:])]
 ax4.set_ylim(ylim)
 plt.legend()
 
@@ -520,6 +525,11 @@ ax4.text(-.26, .95, "(d)", weight="bold", transform=ax4.transAxes)
 plt.savefig('plots/noise_full.png',bbox_inches='tight',dpi=100)
 plt.show()
 plt.close()
+```
+
+```python
+for myatt in [3,6,10,20]:
+    print(f'Minimum temperature for {myatt}dB attenuation: {min(Tnew(freqs,TCold,stagetemps[4],10**(-myatt/10)))} K')
 ```
 
 ```python
